@@ -2,14 +2,14 @@
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
-from demo.unzipper import Unzipper
-from demo.data_extractor import DataExtractor
-from demo.data_wrangler import DataWrangler
+from unzipper import Unzipper
+from data_extractor import DataExtractor
+from data_wrangler import DataWrangler
 
 
 class Demo:
-    def __init__(self, data):
-        self.df = pd.read_csv(data)
+    def __init__(self):
+        self.df = pd.read_csv('cleaned_data.csv')
         self.zipper = Unzipper(os.path.abspath('demo/zipped_data'))
         self.extractor = DataExtractor(directory='unzipped/', features=['id_str', 'text', 'created_at', ('user', 'id_str')])
         self.wrangler = DataWrangler('extracted_data.csv')
@@ -36,5 +36,5 @@ class Demo:
 
 
 if __name__ == ' __main__':
-    demo = Demo('cleaned_data.csv')
+    demo = Demo()
     demo.demo()
