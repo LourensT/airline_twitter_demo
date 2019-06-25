@@ -16,8 +16,9 @@ class DataWrangler:
     """
     Sentiment analysis
     """
-    def __init__(self, data):
-        self.df = pd.read_csv(data)
+    def __init__(self):
+        self.df = pd.read_csv('extracted_data.csv')
+        self.df = self.df[self.df['lang'] == 'en']
         self.stopwords = set(stopwords.words('english'))
         self.stemmer = SnowballStemmer("english")
         self.vectorizer = TfidfVectorizer()
@@ -133,5 +134,5 @@ class DataWrangler:
 
 if __name__ == '__main__':
     # For testing
-    wrangler = DataWrangler('extracted_data.csv')
+    wrangler = DataWrangler()
     wrangler.full_wrangle()

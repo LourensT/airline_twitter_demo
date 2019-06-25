@@ -8,6 +8,12 @@ from unzipper import Unzipper
 from data_extractor import DataExtractor
 from data_wrangler import DataWrangler
 
+# Suppress warnings
+import warnings
+warnings.filterwarnings('ignore')
+warnings.simplefilter("ignore", DeprecationWarning)
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
 
 class Demo:
     """
@@ -16,34 +22,38 @@ class Demo:
     """
     def __init__(self):
         self.df = pd.read_csv('cleaned_data.csv')
-        self.zipper = Unzipper(os.path.abspath('zipped_data'))
-        self.extractor = DataExtractor(directory='unzipped/', features=['id_str', 'text',
-                                                                        'created_at', ('user', 'id_str')])
-        self.wrangler = DataWrangler('extracted_data.csv')
+        #self.zipper = Unzipper(os.path.abspath('zipped_data'))
+        #self.extractor = DataExtractor(directory='unzipped/', features=['id_str', 'text', 'created_at', ('user', 'id_str')])
+        #self.wrangler = DataWrangler()
 
-    def sent_bar(self):
+    def sent_bar(self, data):
         plt.figure(figsize=(8, 5))
-        self.df['sentiments'].value_counts().plot(kind='bar')
-        plt.xticks(fontsize=16, rotation=90)
+        data['sentiments'].value_counts().plot(kind='bar')
+        plt.xticks(fontsize=15, rotation=90)
         plt.xlabel('Sentiment', fontsize=17)
-        plt.yticks(fontsize=16)
+        plt.yticks(fontsize=15)
         plt.ylabel('Frequency', fontsize=17)
         plt.title('Sentiment distribution in dataset', weight='bold', fontsize=20)
+        plt.tight_layout()
         plt.savefig('result.png', dpi=300)
-        plt.show()
 
     def demo(self):
         """
         The final demo that is run at the presentation
         """
         print('Unzipping')
-        self.zipper.unzip_all()
+        zipper = Unzipper(os.path.abspath('zipped_data'))
+        zipper.unzip_all()
         print('Extracting Data')
-        self.extractor.make_csv()
+        extractor = DataExtractor(directory='unzipped/', features=['id_str', 'text', 'lang',
+                                                                   'created_at', ('user', 'id_str')])
+        extractor.make_csv()
         print('Creating new features')
-        self.wrangler.full_wrangle()
+        wrangler = DataWrangler()
+        wrangler.full_wrangle()
         print('Making plot')
-        self.sent_bar()
+        df = pd.read_csv('cleaned_data.csv')
+        self.sent_bar(df)
 
 
 if __name__ == ' __main__':

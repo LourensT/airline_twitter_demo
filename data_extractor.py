@@ -32,7 +32,8 @@ class DataExtractor:
                 try:
                     yield json.loads(line)
                 except json.decoder.JSONDecodeError:
-                    print(f'--JSONDecodeError at line: [{n+1}]--')
+                    pass
+                    # print(f'--JSONDecodeError at line: [{n+1}]--')
 
     def add_content(self):
         """
@@ -44,7 +45,8 @@ class DataExtractor:
             try:
                 rows.append([row[x] if isinstance(x, str) else row[x[0]][x[1]] for x in self.features])
             except KeyError:
-                print(f'--KeyError at line: [{i}]--')
+                pass
+                # print(f'--KeyError at line: [{i}]--')
         return rows
 
     def make_csv(self):
@@ -58,5 +60,5 @@ class DataExtractor:
 
 if __name__ == '__main__':
     # For testing
-    extractor = DataExtractor(directory='unzipped/', features=['id_str', 'text', 'created_at', ('user', 'id_str')])
+    extractor = DataExtractor(directory='unzipped/', features=['id_str', 'text', 'lang', 'created_at', ('user', 'id_str')])
     extractor.make_csv()
