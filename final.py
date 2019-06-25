@@ -16,7 +16,7 @@ class Demo:
     """
     def __init__(self):
         self.df = pd.read_csv('cleaned_data.csv')
-        self.zipper = Unzipper(os.path.abspath('demo/zipped_data'))
+        self.zipper = Unzipper(os.path.abspath('zipped_data'))
         self.extractor = DataExtractor(directory='unzipped/', features=['id_str', 'text',
                                                                         'created_at', ('user', 'id_str')])
         self.wrangler = DataWrangler('extracted_data.csv')
