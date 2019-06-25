@@ -30,6 +30,7 @@ class Demo:
         plt.ylabel('Frequency', fontsize=17)
         plt.title('Sentiment distribution in dataset', weight='bold', fontsize=20)
         plt.savefig('result.png', dpi=300)
+        plt.show()
 
     def demo(self):
         """
