@@ -21,12 +21,10 @@ class Demo:
     repository and outputs the plot
     """
     def __init__(self):
-        self.df = pd.read_csv('cleaned_data.csv')
-        #self.zipper = Unzipper(os.path.abspath('zipped_data'))
-        #self.extractor = DataExtractor(directory='unzipped/', features=['id_str', 'text', 'created_at', ('user', 'id_str')])
-        #self.wrangler = DataWrangler()
+        pass
 
-    def sent_bar(self, data):
+    @staticmethod
+    def sent_bar(data):
         plt.figure(figsize=(8, 5))
         data['sentiments'].value_counts().plot(kind='bar')
         plt.xticks(fontsize=15, rotation=90)
