@@ -48,7 +48,6 @@ class Demo:
         plt.ylabel('Density', size=14)
         plt.grid(True)
         plt.xlabel('Reply Time', size=14)
-        plt.savefig("Histogram_replytime_klm_ba.svg", dpi=300)
         plt.savefig('replytime_result.png', dpi=300)
 
     def demo_replytime(self):
