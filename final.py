@@ -91,6 +91,3 @@ class Demo:
         print('Making plot')
         df = pd.read_csv('cleaned_data.csv')
         self.sent_bar(df)
-
-demo = Demo()
-demo.demo_replytime()
