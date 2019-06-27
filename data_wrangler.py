@@ -1,6 +1,8 @@
 # Standard dependencies
 import numpy as np
 import pandas as pd
+import datetime
+import pickle
 
 # Preprocessing
 from nltk.tokenize import word_tokenize
@@ -18,7 +20,6 @@ class DataWrangler:
     """
     def __init__(self):
         self.df = pd.read_csv('extracted_data.csv')
-        self.df = self.df[self.df['lang'] == 'en']
         self.stopwords = set(stopwords.words('english'))
         self.stemmer = SnowballStemmer("english")
         self.vectorizer = TfidfVectorizer()
@@ -86,6 +87,7 @@ class DataWrangler:
         self.df['cleaned_text'] = preprocessed
 
     def get_sentiments(self):
+        self.df = self.df[self.df['lang'] == 'en']
         self.preprocess()
         vectorized_data = self.vectorize(self.df['cleaned_text'])
         self.df['sentiments'] = [np.argmax(self.nn_model.predict(data)) - 1 for data in vectorized_data]
@@ -114,7 +116,7 @@ class DataWrangler:
     #         elif '@British_Airways' in item['text']:
     #             self.ba_incoming.append(item[['weekday_hour']])
 
-    def full_wrangle(self):
+    def sentiment_wrangle(self):
         print('Getting sentiments')
         self.get_sentiments()
         # print('Getting dates')
@@ -131,8 +133,42 @@ class DataWrangler:
         # print('Saving cleaned dataframe')
         self.df.to_csv('cleaned_data.csv', index=False)
 
+    def timedelta(self, date1, date2):
+            timedelta = date2 - date1
+            return(timedelta.seconds)
+
+    def replytime_wrangle(self, airlineids=False):
+        if airlineids == False:
+            print('Set airlineids to on of the following: 56377143, 106062176, 18332190, 22536055, 124476322, 26223583, 2182373406, 38676903, 1542862735, 253340062, 218730857, 45621423, 20626359]')
+            return False
+        full_df = self.df
+        full_df['created_at'] = pd.to_datetime(full_df['created_at'], format='%a %b %d %H:%M:%S +0000 %Y')
+        full_df = full_df.sort_values(by='created_at', ascending=False)
+
+        response = {}
+        replytime_series = []
+        for data in full_df[["('user', 'id_str')", 'id_str', 'in_reply_to_status_id', 'created_at']].values:
+            if str(data[0]) == str(airlineids):
+                try:
+                    response[int(data[2])] = data[3]
+                except ValueError:
+                    pass
+            else:
+                if int(data[1]) in response.keys():
+                    if response[int(data[1])] > data[3]:
+                        td = self.timedelta(data[3], response[int(data[1])])
+                        replytime_series.append(td)
+
+        # #print(response)
+        # print(replytime_series)
+        # print(len(replytime_series))
+
+        with open('replytimefile', 'wb') as fp:
+            pickle.dump(replytime_series, fp)
+
+
 
 if __name__ == '__main__':
     # For testing
     wrangler = DataWrangler()
-    wrangler.full_wrangle()
+    wrangler.replytime_wrangle(airlineids=56377143)
