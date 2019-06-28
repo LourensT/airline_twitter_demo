@@ -1,8 +1,7 @@
 # Standard dependencies
+import pickle
 import numpy as np
 import pandas as pd
-import datetime
-import pickle
 
 # Preprocessing
 from nltk.tokenize import word_tokenize
@@ -16,7 +15,8 @@ from keras.models import load_model
 
 class DataWrangler:
     """
-    Sentiment analysis
+    Creating of new features and
+    wrangling of information from extracted data
     """
     def __init__(self):
         self.df = pd.read_csv('extracted_data.csv')
@@ -92,45 +92,9 @@ class DataWrangler:
         vectorized_data = self.vectorize(self.df['cleaned_text'])
         self.df['sentiments'] = [np.argmax(self.nn_model.predict(data)) - 1 for data in vectorized_data]
 
-    # def get_dates(self):
-    #     self.df['created_at'] = pd.to_datetime(self.df['created_at'], format="%a %b %d %H:%M:%S +0000 %Y")
-    #     self.df['hour'] = [str(date.hour) for date in self.df['created_at']]
-    #     self.df['hour'] = ['0' + str(hour) if hour != 'nan' and int(hour) < 10 else str(hour) for hour in self.df['hour']]
-    #     self.df['weekday'] = [date.weekday() for date in self.df['created_at']]
-    #     print(self.df['weekday'])
-    #     self.df['weekday'] = self.df['weekday'].astype("category", categories=['Mon', 'Tue',
-    #                                                                            'Wed', 'Thu',
-    #                                                                            'Fri', 'Sat',
-    #                                                                            'Sun']).cat.codes
-    #     self.df['weekday_hour'] = self.df['weekday'].astype(str) + self.df['hour'].astype(str)
-
-    # def get_incoming_outgoing(self):
-    #     # Get Outgoing info
-    #     self.klm_outgoing = self.df[self.df["('user', 'id_str')"] == "56377143"]['weekday_hour']
-    #     self.ba_outgoing = self.df[self.df["('user', 'id_str')"] == "18332190"]['weekday_hour']
-    #
-    #     # Get incoming info
-    #     for i, item in self.df[['text', 'weekday_hour']].iterrows():
-    #         if '@KLM' in item['text']:
-    #             self.klm_incoming.append(item[['weekday_hour']])
-    #         elif '@British_Airways' in item['text']:
-    #             self.ba_incoming.append(item[['weekday_hour']])
-
     def sentiment_wrangle(self):
         print('Getting sentiments')
         self.get_sentiments()
-        # print('Getting dates')
-        # self.get_dates()
-        # print('Getting incoming outcoming')
-        # self.get_incoming_outgoing()
-        # print('Creating cleaned dataframe')
-
-        # cleaned_df = pd.DataFrame({'grouped_sentiments': self.df.groupby('weekday_hour').mean()['sentiments'],
-        #                            'klm_outgoing': pd.Series(self.klm_outgoing).value_counts().sort_index(),
-        #                            'ba_outgoing': pd.Series(self.ba_outgoing).value_counts().sort_index(),
-        #                            'klm_incoming': pd.Series(self.klm_incoming).value_counts().sort_index(),
-        #                            'ba_incoming': pd.Series(self.ba_incoming).value_counts().sort_index()})
-        # print('Saving cleaned dataframe')
         self.df.to_csv('cleaned_data.csv', index=False)
 
     def timedelta(self, date1, date2):
@@ -139,7 +103,7 @@ class DataWrangler:
 
     def replytime_wrangle(self, airlineids=False):
         if airlineids == False:
-            print('Set airlineids to on of the following: 56377143, 106062176, 18332190, 22536055, 124476322, 26223583, 2182373406, 38676903, 1542862735, 253340062, 218730857, 45621423, 20626359]')
+            print('Set airlineids to one of the following: 56377143, 106062176, 18332190, 22536055, 124476322, 26223583, 2182373406, 38676903, 1542862735, 253340062, 218730857, 45621423, 20626359]')
             return False
         full_df = self.df
         full_df['created_at'] = pd.to_datetime(full_df['created_at'], format='%a %b %d %H:%M:%S +0000 %Y')
@@ -177,7 +141,6 @@ class DataWrangler:
         pickle_dictionary = {"KLM": klm_series, "BA" : ba_series}
         with open('replytime_extracted', 'wb') as fp:
             pickle.dump(pickle_dictionary, fp)
-
 
 
 if __name__ == '__main__':

@@ -11,11 +11,9 @@ class DataExtractor:
     def __init__(self, directory, features):
         self.features = features
         self.generator = self.json_read()
-        self.cwd = os.getcwd()
         self.directory = directory
         self.items = os.listdir(directory)
-        self.dataframe = None
-        self.replytimes = {}
+        self.df = None
 
     def json_read(self):
         """
@@ -49,7 +47,7 @@ class DataExtractor:
             except KeyError:
                 pass
                 # print(f'--KeyError at line: [{i}]--')
-        self.dataframe = pd.DataFrame(rows, columns=self.features)
+        self.df = pd.DataFrame(rows, columns=self.features)
 
     def save_csv(self):
         """
@@ -57,10 +55,13 @@ class DataExtractor:
         excluding the ones with KeyErrors and JSONDecodeErrors
         """
         self.add_content()
-        return self.dataframe.to_csv('extracted_data.csv', index=False)
+        return self.df.to_csv('extracted_data.csv', index=False)
 
 
 if __name__ == '__main__':
+    pass
     # For testing
-    extractor = DataExtractor(directory='unzipped/', features=['id_str', 'text', 'lang', 'created_at', ('user', 'id_str'), 'in_reply_to_status_id'])
-    extractor.make_csv()
+    # extractor = DataExtractor(directory='unzipped/',
+    #                           features=['id_str', 'text', 'lang',
+    #                                     'created_at', ('user', 'id_str'), 'in_reply_to_status_id'])
+    # extractor.save_csv()
