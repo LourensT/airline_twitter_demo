@@ -59,9 +59,9 @@ class DataExtractor:
 
 
 if __name__ == '__main__':
-    pass
+    # pass
     # For testing
-    # extractor = DataExtractor(directory='unzipped/',
-    #                           features=['id_str', 'text', 'lang',
-    #                                     'created_at', ('user', 'id_str'), 'in_reply_to_status_id'])
-    # extractor.save_csv()
+    extractor = DataExtractor(directory='unzipped/',
+                              features=['id_str', 'text', 'lang',
+                                        'created_at', ('user', 'id_str'), 'in_reply_to_status_id'])
+    extractor.save_csv()

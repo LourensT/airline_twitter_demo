@@ -1,7 +1,7 @@
 # Standard dependencies
 import pickle
-import numpy as np
 import pandas as pd
+
 
 class DataWrangler:
     """
@@ -11,20 +11,23 @@ class DataWrangler:
     def __init__(self):
         print('Loading extracted data..')
         self.df = pd.read_csv('extracted_data.csv', engine='python')
-        #self.df = pd.read_csv(open('extracted_data.csv','rU'), encoding='utf-8', engine='c')
+        # self.df = pd.read_csv(open('extracted_data.csv','rU'), encoding='utf-8', engine='c')
 
-    def timedelta(self, date1, date2):
+    @staticmethod
+    def timedelta(date1, date2):
             timedelta = date2 - date1
-            return(timedelta.seconds)
+            return timedelta.seconds
 
     def replytime_wrangle(self):
         print('Transforming datestrings to datetime objects..')
         full_df = self.df
-        full_df['created_at'] = pd.to_datetime(full_df['created_at'], format='%a %b %d %H:%M:%S +0000 %Y', errors='coerce')
+        full_df['created_at'] = pd.to_datetime(full_df['created_at'],
+                                               format='%a %b %d %H:%M:%S +0000 %Y',
+                                               errors='coerce')
         full_df = full_df.dropna(subset=['created_at'])
         full_df = full_df.sort_values(by='created_at', ascending=False)
 
-        airlineids=["56377143", "18332190"]
+        airlineids = ["56377143", "18332190"]
 
         klm_dict = {}
         ba_dict = {}
@@ -46,7 +49,7 @@ class DataWrangler:
                     pass
             else:
                 if int(data[1]) in klm_dict.keys():
-                    if (klm_dict[int(data[1])] > data[3]):
+                    if klm_dict[int(data[1])] > data[3]:
                         td = self.timedelta(data[3], klm_dict[int(data[1])])
                         klm_series.append(td)
                 if int(data[1]) in ba_dict.keys():
@@ -54,13 +57,14 @@ class DataWrangler:
                         td = self.timedelta(data[3], ba_dict[int(data[1])])
                         ba_series.append(td)
 
-        pickle_dictionary = {"KLM": klm_series, "BA" : ba_series}
+        pickle_dictionary = {"KLM": klm_series, "BA": ba_series}
         with open('processed_data', 'wb') as fp:
             pickle.dump(pickle_dictionary, fp)
 
         print('Pickled replytime series succesfully..')
 
+
 if __name__ == '__main__':
     # For testing
     wrangler = DataWrangler()
-    wrangler.replytime_wrangle(airlineids=[56377143,18332190])
+    wrangler.replytime_wrangle()
