@@ -3,113 +3,28 @@ import pickle
 import numpy as np
 import pandas as pd
 
-# Preprocessing
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
-from nltk.stem.snowball import SnowballStemmer
-from sklearn.feature_extraction.text import TfidfVectorizer
-
-# Machine Learning
-from keras.models import load_model
-
-
 class DataWrangler:
     """
     Creating of new features and
     wrangling of information from extracted data
     """
     def __init__(self):
-        self.df = pd.read_csv('extracted_data.csv')
-        self.stopwords = set(stopwords.words('english'))
-        self.stemmer = SnowballStemmer("english")
-        self.vectorizer = TfidfVectorizer()
-        self.nn_model = load_model('nn_sentiment_model.h5')
-
-        self.klm_incoming = []
-        self.ba_incoming = []
-        self.klm_outgoing = []
-        self.ba_outgoing = []
-
-    @staticmethod
-    def tokenize(sentence):
-        """
-        Splits up words and makes a list of all words in the tweet
-        """
-        tokenized_sentence = word_tokenize(sentence)
-        return tokenized_sentence
-
-    def remove_stopwords(self, sentence):
-        """
-        Removes stopwords like 'a', 'the', 'and', etc.
-        """
-        filtered_sentence = []
-        for w in sentence:
-            if w not in self.stopwords and len(w) > 1 and w[:2] != '//' and w != 'https':
-                filtered_sentence.append(w)
-        return filtered_sentence
-
-    def stem(self, sentence):
-        """
-        Stems certain words to their root form.
-        For example, words like 'computer', 'computation'
-        all get trunacated to 'comput'
-        """
-        return [self.stemmer.stem(word) for word in sentence]
-
-    @staticmethod
-    def join_to_string(sentence):
-        """
-        Joins the tokenized words to one string.
-        """
-        return ' '.join(sentence)
-
-    def vectorize(self, data):
-        """
-        Vectorizes a preprocessed sentence into a TF-IDF format
-        Returns a sparse matrix
-        """
-        _ = self.vectorizer.fit_transform(np.load('vector.npy', allow_pickle=True))
-        return self.vectorizer.transform(data)
-
-    def preprocess(self):
-        """
-        Preprocess a sentence and
-        connect back to string
-        """
-        # Perform preprocessing
-        preprocessed = []
-        for sentence in self.df['text']:
-            tokenized = self.tokenize(sentence)
-            cleaned = self.remove_stopwords(tokenized)
-            stemmed = self.stem(cleaned)
-            joined = self.join_to_string(stemmed)
-            preprocessed.append(joined)
-        self.df['cleaned_text'] = preprocessed
-
-    def get_sentiments(self):
-        self.df = self.df[self.df['lang'] == 'en']
-        self.preprocess()
-        vectorized_data = self.vectorize(self.df['cleaned_text'])
-        self.df['sentiments'] = [np.argmax(self.nn_model.predict(data)) - 1 for data in vectorized_data]
-
-    def sentiment_wrangle(self):
-        print('Getting sentiments')
-        self.get_sentiments()
-        self.df.to_csv('cleaned_data.csv', index=False)
+        print('Loading extracted data..')
+        self.df = pd.read_csv('extracted_data.csv', engine='python')
+        #self.df = pd.read_csv(open('extracted_data.csv','rU'), encoding='utf-8', engine='c')
 
     def timedelta(self, date1, date2):
             timedelta = date2 - date1
             return(timedelta.seconds)
 
-    def replytime_wrangle(self, airlineids=False):
-        if airlineids == False:
-            print('Set airlineids to one of the following: 56377143, 106062176, 18332190, 22536055, 124476322, 26223583, 2182373406, 38676903, 1542862735, 253340062, 218730857, 45621423, 20626359]')
-            return False
+    def replytime_wrangle(self):
+        print('Transforming datestrings to datetime objects..')
         full_df = self.df
-        full_df['created_at'] = pd.to_datetime(full_df['created_at'], format='%a %b %d %H:%M:%S +0000 %Y')
+        full_df['created_at'] = pd.to_datetime(full_df['created_at'], format='%a %b %d %H:%M:%S +0000 %Y', errors='coerce')
+        full_df = full_df.dropna(subset=['created_at'])
         full_df = full_df.sort_values(by='created_at', ascending=False)
 
-        airlineids = [str(n) for n in airlineids]
+        airlineids=["56377143", "18332190"]
 
         klm_dict = {}
         ba_dict = {}
@@ -117,6 +32,7 @@ class DataWrangler:
         klm_series = []
         ba_series = []
 
+        print('Extracting replytime series..')
         for data in full_df[["('user', 'id_str')", 'id_str', 'in_reply_to_status_id', 'created_at']].values:
             if str(data[0]) == airlineids[0]:
                 try:
@@ -130,7 +46,7 @@ class DataWrangler:
                     pass
             else:
                 if int(data[1]) in klm_dict.keys():
-                    if klm_dict[int(data[1])] > data[3]:
+                    if (klm_dict[int(data[1])] > data[3]):
                         td = self.timedelta(data[3], klm_dict[int(data[1])])
                         klm_series.append(td)
                 if int(data[1]) in ba_dict.keys():
@@ -139,9 +55,10 @@ class DataWrangler:
                         ba_series.append(td)
 
         pickle_dictionary = {"KLM": klm_series, "BA" : ba_series}
-        with open('replytime_extracted', 'wb') as fp:
+        with open('processed_data', 'wb') as fp:
             pickle.dump(pickle_dictionary, fp)
 
+        print('Pickled replytime series succesfully..')
 
 if __name__ == '__main__':
     # For testing

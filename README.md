@@ -1,2 +1,6 @@
-# airline_twitter_demo
-Demo for sentiment analysis of airline's twitter data
+# How To Run
+open cmd,
+
+* python demo.py 
+
+wait
