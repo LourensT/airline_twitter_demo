@@ -3,21 +3,15 @@ import os
 import pickle
 from PIL import Image
 
-# Visualization
-import matplotlib
-matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
-
 # Import modules for demo
 from unzipper import Unzipper
 from data_extractor import DataExtractor
 from data_wrangler import DataWrangler
 
-# Visualization for MAC OSX
-from sys import platform
-if platform == "darwin":
-    import matplotlib
-    matplotlib.use('TkAgg')
+# Visualization
+import matplotlib
+matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
 
 
 class Demo:
@@ -35,7 +29,7 @@ class Demo:
         and outputs a histogram of replytime
         for KLM and British Airways
         """
-        fig, ax = plt.subplots(nrows=1, ncols=1)
+        fig, __ = plt.subplots(nrows=1, ncols=1)
         plt.hist(replytime_data["KLM"], normed=True, color='b', alpha=0.5, bins=500, label="KLM")
         plt.hist(replytime_data["BA"], normed=True, color='g', alpha=0.5, bins=500, label="British Airways")
         plt.xlim(0, 21600)
@@ -47,6 +41,7 @@ class Demo:
         plt.grid(True)
         plt.xlabel('Reply Time', size=14)
         plt.savefig('PLOT.png', dpi=300)
+        plt.close(fig)
 
     @staticmethod
     def show_plot():
