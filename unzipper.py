@@ -23,9 +23,3 @@ class Unzipper:
         """
         for file in os.listdir(self.dir):
             self.unzip(f'{self.dir}/{file}')
-
-
-if __name__ == '__main__':
-    # For testing
-    zipper = Unzipper(os.path.abspath('zipped_data'))
-    zipper.unzip_all()

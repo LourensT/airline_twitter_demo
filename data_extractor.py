@@ -1,3 +1,4 @@
+# Standard dependencies
 import os
 import json
 import pandas as pd
@@ -33,7 +34,6 @@ class DataExtractor:
                     yield json.loads(line)
                 except json.decoder.JSONDecodeError:
                     pass
-                    # print(f'--JSONDecodeError at line: [{n+1}]--')
 
     def add_content(self):
         """
@@ -46,7 +46,6 @@ class DataExtractor:
                 rows.append([row[x] if isinstance(x, str) else row[x[0]][x[1]] for x in self.features])
             except KeyError:
                 pass
-                # print(f'--KeyError at line: [{i}]--')
         self.df = pd.DataFrame(rows, columns=self.features)
 
     def save_csv(self):
@@ -56,12 +55,3 @@ class DataExtractor:
         """
         self.add_content()
         return self.df.to_csv('extracted_data.csv', index=False)
-
-
-if __name__ == '__main__':
-    # pass
-    # For testing
-    extractor = DataExtractor(directory='unzipped/',
-                              features=['id_str', 'text', 'lang',
-                                        'created_at', ('user', 'id_str'), 'in_reply_to_status_id'])
-    extractor.save_csv()

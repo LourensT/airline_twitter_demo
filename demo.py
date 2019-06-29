@@ -1,16 +1,26 @@
-# Import standard dependencies
-import os
-import pickle
-from PIL import Image
-
-# Import modules for demo
+# Modules for demo
 from unzipper import Unzipper
 from data_extractor import DataExtractor
 from data_wrangler import DataWrangler
 
+# Standard dependencies
+import os
+import sys
+import pickle
+from PIL import Image
+
+# Suppress deprecation warnings
+import warnings
+warnings.filterwarnings('ignore')
+warnings.simplefilter("ignore", DeprecationWarning)
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+# Backend fix for Mac OSX
+if sys.platform == 'darwin':
+    import matplotlib
+    matplotlib.use('TkAgg')
+
 # Visualization
-import matplotlib
-matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 
