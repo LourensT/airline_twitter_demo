@@ -30,6 +30,11 @@ class Demo:
 
     @staticmethod
     def save_plot(replytime_data):
+        """
+        Takes replytime data as input
+        and outputs a histogram of replytime
+        for KLM and British Airways
+        """
         fig, ax = plt.subplots(nrows=1, ncols=1)
         plt.hist(replytime_data["KLM"], normed=True, color='b', alpha=0.5, bins=500, label="KLM")
         plt.hist(replytime_data["BA"], normed=True, color='g', alpha=0.5, bins=500, label="British Airways")
@@ -45,12 +50,16 @@ class Demo:
 
     @staticmethod
     def show_plot():
+        """
+        Displays the plot that is created
+        in save_plot
+        """
         print("showing PLOT.png..")
         Image.open("PLOT.png").show()
 
     def run(self):
         """
-        demo for histogram of replytime
+        Demo for histogram of replytime
         """
         print('Initialized!')
         print("=====================================")

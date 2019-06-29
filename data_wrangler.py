@@ -5,8 +5,8 @@ import pandas as pd
 
 class DataWrangler:
     """
-    Creating of new features and
-    wrangling of information from extracted data
+    Creation of new features and
+    wrangling of information from extracted_data
     """
     def __init__(self):
         print('Loading extracted data..')
@@ -15,8 +15,11 @@ class DataWrangler:
 
     @staticmethod
     def timedelta(date1, date2):
-            timedelta = date2 - date1
-            return timedelta.seconds
+        """
+        Calculates the difference between dates in seconds
+        """
+        timedelta = date2 - date1
+        return timedelta.seconds
 
     def replytime_wrangle(self):
         print('Transforming datestrings to datetime objects..')
@@ -62,9 +65,3 @@ class DataWrangler:
             pickle.dump(pickle_dictionary, fp)
 
         print('Pickled replytime series succesfully..')
-
-
-if __name__ == '__main__':
-    # For testing
-    wrangler = DataWrangler()
-    wrangler.replytime_wrangle()
